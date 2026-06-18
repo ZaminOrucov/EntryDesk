@@ -1,24 +1,20 @@
 import SwiftUI
 import Combine
-// İstifadəçi statuslarını idarə etmək üçün sadə bir model
 class AppState: ObservableObject {
     @Published var isAuthenticated: Bool = false
-    @Published var isLoggedIn: Bool = false // İşdə olub-olmama statusu
-    @Published var userName: String = "Zamin" // Giriş edən işçinin adı
-    @Published var isDarkMode: Bool = false // Qaranlıq Mod
+    @Published var isLoggedIn: Bool = false
+    @Published var userName: String = "Zamin"
+    @Published var isDarkMode: Bool = false
     @Published var selectedTab: Tab = .home
     
     enum Tab {
         case home, chat, tracking, more
     }
 }
-
-// MARK: - Əsas ContentView
 struct ContentView: View {
     @StateObject private var appState = AppState()
     
     var body: some View {
-        // AppState-dəki isDarkMode dəyişəninə əsasən rəng sxemini təyin edir
         ZStack {
             if appState.isAuthenticated {
                 MainTabView(appState: appState)
@@ -30,8 +26,6 @@ struct ContentView: View {
         }
     }
 }
-
-// MARK: - 1. Giriş Ekranı (LoginView)
 struct LoginView: View {
     @ObservedObject var appState: AppState
     @State private var username: String = ""
@@ -41,8 +35,6 @@ struct LoginView: View {
         NavigationView {
             VStack(spacing: 25) {
                 Spacer()
-                
-                // Logo və Başlıq
                 VStack(spacing: 10) {
                     Image(systemName: "lock.shield.fill")
                         .resizable()
@@ -58,8 +50,6 @@ struct LoginView: View {
                         .foregroundColor(.gray)
                 }
                 .padding(.bottom, 30)
-                
-                // Giriş Sahələri
                 VStack(spacing: 15) {
                     TextField("İstifadəçi Adı", text: $username)
                         .padding()
@@ -74,14 +64,10 @@ struct LoginView: View {
                         .cornerRadius(10)
                 }
                 .padding(.horizontal)
-                
-                // Giriş Düyməsi
                 Button(action: {
-                    // *** Real Authentification loqikası bura yazılmalıdır ***
                     if username == "demo" && password == "123" {
                         appState.isAuthenticated = true
                     } else {
-                        // Xəta mesajı göstərilə bilər
                     }
                 }) {
                     Text("Giriş Et")
@@ -107,36 +93,26 @@ struct LoginView: View {
         }
     }
 }
-
-// MARK: - 2. Əsas Menyu (MainTabView)
 struct MainTabView: View {
     @ObservedObject var appState: AppState
     
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            
-            // 2.1. Əsas Ekran (HomeView)
             HomeView(appState: appState)
                 .tabItem {
                     Label("Əsas", systemImage: "house.fill")
                 }
                 .tag(AppState.Tab.home)
-            
-            // 2.2. Köməkçi Çat (ChatView)
             ChatView()
                 .tabItem {
                     Label("Köməkçi Çat", systemImage: "message.fill")
                 }
                 .tag(AppState.Tab.chat)
-            
-            // 2.3. Nəzarət (TrackingView)
             TrackingView()
                 .tabItem {
                     Label("Nəzarət", systemImage: "chart.bar.doc.horizontal.fill")
                 }
                 .tag(AppState.Tab.tracking)
-            
-            // 2.4. Daha Çox (MoreView)
             MoreView(appState: appState)
                 .tabItem {
                     Label("Daha Çox", systemImage: "ellipsis.circle.fill")
@@ -145,8 +121,6 @@ struct MainTabView: View {
         }
     }
 }
-
-// MARK: - 3. Əsas Ekran (HomeView)
 struct HomeView: View {
     @ObservedObject var appState: AppState
     
@@ -154,8 +128,7 @@ struct HomeView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    
-                    // Müəssisə haqqında Professional Dizayn
+
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Şirkət Adı")
                             .font(.largeTitle)
@@ -179,8 +152,6 @@ struct HomeView: View {
                             .shadow(color: Color.gray.opacity(0.2), radius: 5, x: 0, y: 5)
                     )
                     .padding(.horizontal)
-                    
-                    // Ayın Ən Yaxşı İşçisi Kartı
                     VStack {
                         Text("🏆 Ayın Ən Yaxşı İşçisi")
                             .font(.title2)
@@ -203,8 +174,6 @@ struct HomeView: View {
                     .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing))
                     .cornerRadius(20)
                     .padding(.horizontal)
-                    
-                    // Giriş/Çıxış Düyməsi
                     VStack {
                         Text(appState.isLoggedIn ? "İş Başındadır" : "İşdə Deil")
                             .font(.headline)
@@ -212,7 +181,6 @@ struct HomeView: View {
                         
                         Button(action: {
                             appState.isLoggedIn.toggle()
-                            // Real vaxt qeydiyyatı loqikası
                             print(appState.isLoggedIn ? "Giriş qeydə alındı." : "Çıxış qeydə alındı.")
                         }) {
                             Text(appState.isLoggedIn ? "Çıxış Vur" : "Giriş Vur")
@@ -237,8 +205,6 @@ struct HomeView: View {
         }
     }
 }
-
-// MARK: - 4. Köməkçi Çat (ChatView)
 struct ChatView: View {
     var body: some View {
         NavigationView {
@@ -259,8 +225,6 @@ struct ChatView: View {
         }
     }
 }
-
-// MARK: - 5. Nəzarət (TrackingView)
 struct TrackingView: View {
     var body: some View {
         NavigationView {
@@ -269,7 +233,6 @@ struct TrackingView: View {
                     TrackingRow(date: "18 Noyabr", checkIn: "08:58", checkOut: "18:05")
                     TrackingRow(date: "17 Noyabr", checkIn: "09:02", checkOut: "18:01")
                     TrackingRow(date: "16 Noyabr", checkIn: "08:55", checkOut: "17:59")
-                    // Real tətbiqdə dövr (loop) istifadə edilməlidir
                 }
                 
                 Section(header: Text("Aylıq Göstəricilər")) {
@@ -312,15 +275,12 @@ struct TrackingRow: View {
         }
     }
 }
-
-// MARK: - 6. Daha Çox (MoreView)
 struct MoreView: View {
     @ObservedObject var appState: AppState
     
     var body: some View {
         NavigationView {
             List {
-                // 6.1. Profil Ayarları
                 Section(header: Text("Ümumi Profil")) {
                     NavigationLink(destination: ProfileSettingsView()) {
                         Label("Profil Tənzimlənməsi", systemImage: "person.circle.fill")
@@ -332,22 +292,16 @@ struct MoreView: View {
                             .foregroundColor(.gray)
                     }
                 }
-                
-                // 6.2. Qaranlıq Mod Ayarı
                 Section(header: Text("Tətbiq Görünüşü")) {
                     Toggle(isOn: $appState.isDarkMode) {
                         Label("Qaranlıq Mod", systemImage: appState.isDarkMode ? "moon.fill" : "sun.max.fill")
                     }
                 }
-                
-                // 6.3. Bildiriş Ayarları
                 Section(header: Text("Bildirişlər")) {
                     NavigationLink(destination: NotificationSettingsView()) {
                         Label("Giriş/Çıxış Bildirişləri", systemImage: "bell.badge.fill")
                     }
                 }
-                
-                // 6.4. Çıxış
                 Section {
                     Button(action: {
                         appState.isAuthenticated = false
@@ -362,8 +316,6 @@ struct MoreView: View {
         }
     }
 }
-
-// MARK: - 7. Profil Tənzimlənməsi (ProfileSettingsView)
 struct ProfileSettingsView: View {
     var body: some View {
         Form {
@@ -377,8 +329,6 @@ struct ProfileSettingsView: View {
         .navigationTitle("Profil Tənzimlənməsi")
     }
 }
-
-// MARK: - 8. Bildiriş Ayarları (NotificationSettingsView)
 struct NotificationSettingsView: View {
     @State private var checkInReminder: Bool = true
     @State private var checkOutReminder: Bool = true
